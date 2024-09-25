@@ -35,6 +35,9 @@ public class User {
     @NotNull
     private String phone;
 
+    @NotNull
+    private String address;
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JsonIgnoreProperties(value = "users")
     @JoinTable(

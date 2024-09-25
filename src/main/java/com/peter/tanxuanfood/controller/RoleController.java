@@ -1,9 +1,8 @@
 package com.peter.tanxuanfood.controller;
 
 import com.peter.tanxuanfood.domain.ApiResponse;
-import com.peter.tanxuanfood.domain.User;
-import com.peter.tanxuanfood.domain.dto.CreateUserRequest;
-import com.peter.tanxuanfood.service.UserService;
+import com.peter.tanxuanfood.domain.Role;
+import com.peter.tanxuanfood.service.RoleService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -16,16 +15,17 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1")
-public class UserController {
-    private final UserService userService;
+public class RoleController {
+    private final RoleService roleService;
 
-    @PostMapping("/users/create")
-    public ResponseEntity<ApiResponse<User>> handleCreateUser(@Valid @RequestBody CreateUserRequest createUserRequest) {
-        User user = this.userService.handleCreateUser(createUserRequest);
-        ApiResponse<User> apiResponse = new ApiResponse<>();
+    @PostMapping("/roles/create")
+    public ResponseEntity<ApiResponse<Role>> handleCreateRole(@Valid @RequestBody Role requestRole) {
+        Role role = this.roleService.handleCreateRole(requestRole);
+        ApiResponse<Role> apiResponse = new ApiResponse<>();
         apiResponse.setStatusCode(HttpStatus.CREATED.value());
-        apiResponse.setData(user);
-        return ResponseEntity.status(HttpStatus.CREATED).body(apiResponse);
+        apiResponse.setData(role);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(apiResponse);
     }
-
 }

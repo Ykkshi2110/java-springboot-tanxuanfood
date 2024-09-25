@@ -2,5 +2,7 @@ package com.peter.tanxuanfood.type;
 
 public enum RoleType {
     ADMIN,
-    USER
+    USER,
+    CEO,
+    CO_FOUNDER
 }

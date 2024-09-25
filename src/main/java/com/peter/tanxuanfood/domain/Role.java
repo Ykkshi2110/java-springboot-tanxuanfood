@@ -7,7 +7,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.Instant;
-import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -16,11 +15,12 @@ import java.util.Set;
 @Table(name = "roles")
 public class Role {
     @Id
-    @GeneratedValue (strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     @Enumerated(EnumType.STRING)
-    private RoleType roleType;
+    @Column(name = "name")
+    private RoleType name;
 
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "roles")
     @JsonIgnore
