@@ -7,10 +7,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -27,5 +24,22 @@ public class RoleController {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(apiResponse);
+    }
+
+    @PutMapping("/roles/update")
+    public ResponseEntity<ApiResponse<Role>> handleUpdateRole(@Valid @RequestBody Role requestRole) {
+        Role role = this.roleService.handleUpdateRole(requestRole);
+        ApiResponse<Role> apiResponse = new ApiResponse<>();
+        apiResponse.setStatusCode(HttpStatus.OK.value());
+        apiResponse.setData(role);
+        return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
+    }
+
+    @DeleteMapping("/roles/delete/{id}")
+    public ResponseEntity<ApiResponse<Void>> handleDeleteRole(@PathVariable long id) {
+        this.roleService.handleDeleteRole(id);
+        ApiResponse<Void> apiResponse = new ApiResponse<>();
+        apiResponse.setStatusCode(HttpStatus.NO_CONTENT.value());
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(apiResponse);
     }
 }

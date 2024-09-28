@@ -28,6 +28,6 @@ public class CreateUserRequest {
     @NotNull
     private String address;
 
-    private Set<Long> requestRoles;
+    private Set<Role> roles;
 
 }

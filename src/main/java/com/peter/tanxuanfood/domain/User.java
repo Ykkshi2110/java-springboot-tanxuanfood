@@ -47,7 +47,7 @@ public class User {
     )
     private Set<Role> roles = new HashSet<>();
 
-    @OneToOne(fetch = FetchType.LAZY, mappedBy = "user")
+    @OneToOne(mappedBy = "user")
     private Cart cart;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")

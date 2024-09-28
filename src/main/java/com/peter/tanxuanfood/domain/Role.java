@@ -3,6 +3,7 @@ package com.peter.tanxuanfood.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.peter.tanxuanfood.type.RoleType;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -21,6 +22,10 @@ public class Role {
     @Enumerated(EnumType.STRING)
     @Column(name = "name")
     private RoleType name;
+
+    @NotNull
+    @Column(columnDefinition = "MEDIUMTEXT")
+    private String description;
 
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "roles")
     @JsonIgnore
