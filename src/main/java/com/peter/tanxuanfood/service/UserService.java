@@ -8,6 +8,7 @@ import com.peter.tanxuanfood.domain.dto.ResultPaginationDTO;
 import com.peter.tanxuanfood.domain.dto.UserDTO;
 import com.peter.tanxuanfood.exception.IdInValidException;
 import com.peter.tanxuanfood.repository.UserRepository;
+import com.peter.tanxuanfood.service.predicate.UserPredicate;
 import com.querydsl.core.types.Predicate;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -24,6 +27,8 @@ public class UserService {
     private final UserRepository userRepository;
     private final RoleService roleService;
     private final ModelMapper modelMapper;
+
+    private static final String USER_ERROR = "User does not exists";
 
     public User handleCreateUser(@Valid CreateUserRequest createUserRequest) {
         if (this.userRepository.existsByEmail(createUserRequest.getEmail()))
@@ -48,7 +53,7 @@ public class UserService {
     public User handleUpdateUser(User user) {
         User currentUser = this.userRepository
                 .findById(user.getId())
-                .orElseThrow(() -> new IdInValidException("User does not exist"));
+                .orElseThrow(() -> new IdInValidException(USER_ERROR));
         currentUser.setFullName(user.getFullName());
         currentUser.setAddress(user.getAddress());
         currentUser.setPhone(user.getPhone());
@@ -64,12 +69,16 @@ public class UserService {
     }
 
     public void handleDeleteUser(long id) {
-        User currentUser = this.userRepository.findById(id).orElseThrow(() -> new IdInValidException("User does not exist"));
+        User currentUser = this.userRepository
+                .findById(id)
+                .orElseThrow(() -> new IdInValidException(USER_ERROR));
         this.userRepository.delete(currentUser);
     }
 
-    public ResultPaginationDTO fetchAllUser(Pageable pageable){
-        Page<User> pageUsers = this.userRepository.findAll(pageable);
+    public ResultPaginationDTO fetchAllUser(Optional<String> optionalName, Pageable pageable) {
+        String name = optionalName.orElse("");
+        Predicate predicate = UserPredicate.containsName(name);
+        Page<User> pageUsers = this.userRepository.findAll(predicate, pageable);
         Page<UserDTO> pageUserDTOs = pageUsers.map(element -> modelMapper.map(element, UserDTO.class));
         Meta meta = new Meta();
         meta.setPage(pageable.getPageNumber() + 1);
@@ -80,6 +89,13 @@ public class UserService {
         result.setMeta(meta);
         result.setData(pageUserDTOs.getContent());
         return result;
+    }
+
+    public UserDTO fetchUserById(long id) {
+        User user = this.userRepository
+                .findById(id)
+                .orElseThrow(() -> new IdInValidException(USER_ERROR));
+        return modelMapper.map(user, UserDTO.class);
     }
 
 }
