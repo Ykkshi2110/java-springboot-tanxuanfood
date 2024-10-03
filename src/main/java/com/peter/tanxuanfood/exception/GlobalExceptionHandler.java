@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -56,14 +55,14 @@ public class GlobalExceptionHandler {
     }
 
     //    Handle Exception not define
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiResponse<Object>> handleAllException(Exception e) {
-        ApiResponse<Object> apiResponse = new ApiResponse<>();
-        apiResponse.setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
-        apiResponse.setMessage("Exception occurs...");
-        apiResponse.setError("Internal Server Error");
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(apiResponse);
-    }
+//    @ExceptionHandler(Exception.class)
+//    public ResponseEntity<ApiResponse<Object>> handleAllException(Exception e) {
+//        ApiResponse<Object> apiResponse = new ApiResponse<>();
+//        apiResponse.setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+//        apiResponse.setMessage("Exception occurs...");
+//        apiResponse.setError("Internal Server Error");
+//        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(apiResponse);
+//    }
 
 
 }

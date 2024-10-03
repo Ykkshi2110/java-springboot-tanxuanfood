@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -27,6 +28,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final RoleService roleService;
     private final ModelMapper modelMapper;
+    private final PasswordEncoder passwordEncoder;
 
     private static final String USER_ERROR = "User does not exists";
 
@@ -36,7 +38,9 @@ public class UserService {
         User user = new User();
         user.setFullName(createUserRequest.getFullName());
         user.setEmail(createUserRequest.getEmail());
-        user.setPassword(createUserRequest.getPassword());
+
+        String hashPassword = passwordEncoder.encode(createUserRequest.getPassword());
+        user.setPassword(hashPassword);
         user.setPhone(createUserRequest.getPhone());
         user.setAddress(createUserRequest.getAddress());
 
@@ -96,6 +100,10 @@ public class UserService {
                 .findById(id)
                 .orElseThrow(() -> new IdInValidException(USER_ERROR));
         return modelMapper.map(user, UserDTO.class);
+    }
+
+    public User handleGetUserByUserName(String email){
+        return this.userRepository.findByEmail(email);
     }
 
 }
