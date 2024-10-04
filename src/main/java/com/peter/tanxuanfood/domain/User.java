@@ -1,6 +1,7 @@
 package com.peter.tanxuanfood.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.peter.tanxuanfood.convert.util.SecurityUtil;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
@@ -38,6 +39,9 @@ public class User {
     @NotNull
     private String address;
 
+    @Column(columnDefinition = "MEDIUMTEXT")
+    private String refreshToken;
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JsonIgnoreProperties(value = "users")
     @JoinTable(
@@ -57,4 +61,16 @@ public class User {
     private Instant updatedAt;
     private String createdBy;
     private String updatedBy;
+
+    @PrePersist
+    public void handleBeforeCreate() {
+        this.createdAt = Instant.now();
+        this.createdBy = SecurityUtil.getCurrentUserLogin().orElse("");
+    }
+
+    @PreUpdate
+    public void handleBeforeUpdate() {
+        this.updatedAt = Instant.now();
+        this.updatedBy = SecurityUtil.getCurrentUserLogin().orElse("");
+    }
 }
