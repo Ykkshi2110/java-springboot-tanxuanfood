@@ -1,7 +1,10 @@
 package com.peter.tanxuanfood.convert.util;
 
+import com.nimbusds.jose.util.Base64;
 import com.peter.tanxuanfood.domain.dto.ResLoginDTO;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -11,6 +14,8 @@ import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.*;
 import org.springframework.stereotype.Service;
 
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
@@ -20,6 +25,7 @@ import java.util.Optional;
 public class SecurityUtil {
 
     private final JwtEncoder jwtEncoder;
+    private final Logger logger = LoggerFactory.getLogger(SecurityUtil.class);
 
     public static final MacAlgorithm JWT_ALGORITHM = MacAlgorithm.HS512;
 
@@ -33,7 +39,7 @@ public class SecurityUtil {
     private long refreshTokenExpiration;
 
 
-    public String createAccessToken(Authentication authentication, ResLoginDTO.UserLogin userLogin){
+    public String createAccessToken(String email, ResLoginDTO.UserLogin userLogin){
          Instant now = Instant.now();
          Instant validity = now.plus(this.accessTokenExpiration, ChronoUnit.SECONDS);
 
@@ -42,7 +48,7 @@ public class SecurityUtil {
          JwtClaimsSet claims = JwtClaimsSet.builder()
                                            .issuedAt(now)
                                            .expiresAt(validity)
-                                           .subject(authentication.getName())
+                                           .subject(email)
                                            .claim("user", userLogin)
                                            .build();
          JwsHeader jwsHeader = JwsHeader.with(JWT_ALGORITHM).build();
@@ -89,6 +95,23 @@ public class SecurityUtil {
                        .filter(authentication -> authentication.getCredentials() instanceof String)
                        .map(authentication -> (String) authentication.getCredentials());
 
+    }
+
+    public SecretKey getSecretKey(){
+        byte[] keyBytes = Base64
+                .from(jwtKey).decode();
+        return new SecretKeySpec(keyBytes, 0, keyBytes.length, JWT_ALGORITHM.getName());
+    }
+
+    public Jwt checkValidRefreshToken(String token){
+        NimbusJwtDecoder jwtDecoder = NimbusJwtDecoder.withSecretKey(
+                getSecretKey()).macAlgorithm(JWT_ALGORITHM).build();
+        try{
+            return jwtDecoder.decode(token);
+        } catch (Exception e){
+            logger.error(">>> Refresh Token error: {}", e.getMessage());
+            throw  e;
+        }
     }
 
 

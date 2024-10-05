@@ -9,4 +9,5 @@ import org.springframework.stereotype.Repository;
 public interface UserRepository extends JpaRepository<User, Long>, QuerydslPredicateExecutor<User> {
     boolean existsByEmail(String email);
     User findByEmail(String email);
+    User findByRefreshTokenAndEmail (String refreshToken, String email);
 }

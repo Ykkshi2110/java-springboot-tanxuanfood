@@ -5,6 +5,7 @@ import com.peter.tanxuanfood.convert.util.SecurityUtil;
 import com.peter.tanxuanfood.domain.User;
 import com.peter.tanxuanfood.domain.dto.LoginDTO;
 import com.peter.tanxuanfood.domain.dto.ResLoginDTO;
+import com.peter.tanxuanfood.exception.IdInValidException;
 import com.peter.tanxuanfood.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -29,6 +31,8 @@ public class AuthController {
     private final SecurityUtil securityUtil;
     private final UserService userService;
     private final ModelMapper modelMapper;
+
+    private static final String REFRESH_TOKEN = "refreshToken";
 
     @Value("${peter.jwt.refresh-token-validity-in-seconds}")
     private long refreshTokenExpiration;
@@ -69,7 +73,7 @@ public class AuthController {
         } else {
             resLoginDTO.setUserLogin(null);
         }
-        String accessToken = this.securityUtil.createAccessToken(authentication, resLoginDTO.getUserLogin());
+        String accessToken = this.securityUtil.createAccessToken(authentication.getName(), resLoginDTO.getUserLogin());
         resLoginDTO.setAccessToken(accessToken);
 
         // create refresh token
@@ -80,7 +84,7 @@ public class AuthController {
 
         // set Cookies
         ResponseCookie responseCookie = ResponseCookie
-                .from("refreshToken", refreshToken)
+                .from(REFRESH_TOKEN, refreshToken)
                 .secure(true)
                 .httpOnly(true)
                 .path("/api/v1")
@@ -107,4 +111,77 @@ public class AuthController {
                 .ok()
                 .body(userLogin);
     }
+
+    @GetMapping("/auth/refresh")
+    @ApiMessage("Get user by refresh token")
+    public ResponseEntity<ResLoginDTO> getRefreshToken(@CookieValue(name = REFRESH_TOKEN, defaultValue = "abc") String refreshToken) {
+        if (refreshToken.equals("abc")) {
+            throw new IdInValidException("You don't have a refresh token in cookies");
+        }
+        // check valid
+        Jwt decodedToken = this.securityUtil.checkValidRefreshToken(refreshToken);
+        String email = decodedToken.getSubject();
+
+        // check user by token + email
+        User currentUser = this.userService.getUserByRefreshTokenAndEmail(refreshToken, email);
+        if (currentUser == null) {
+            throw new IdInValidException("Refresh Token is valid");
+        }
+
+        ResLoginDTO resLoginDTO = new ResLoginDTO();
+        User currentUserDB = this.userService.handleGetUserByUserName(email);
+        if (currentUserDB != null) {
+            ResLoginDTO.UserLogin userLogin = this.mapToUserLogin(currentUserDB);
+            resLoginDTO.setUserLogin(userLogin);
+        }
+        String accessToken = this.securityUtil.createAccessToken(email, resLoginDTO.getUserLogin());
+        resLoginDTO.setAccessToken(accessToken);
+
+        // create refresh token
+        String newRefreshToken = this.securityUtil.createRefreshToken(email, resLoginDTO);
+
+        // update user
+        this.userService.updateUserToken(refreshToken, email);
+
+        // set Cookies
+        ResponseCookie responseCookie = ResponseCookie
+                .from(REFRESH_TOKEN, newRefreshToken)
+                .secure(true)
+                .httpOnly(true)
+                .path("/api/v1")
+                .maxAge(refreshTokenExpiration)
+                .build();
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .header(HttpHeaders.SET_COOKIE, responseCookie.toString())
+                .body(resLoginDTO);
+    }
+
+    @PostMapping("/auth/logout")
+    @ApiMessage("Logout user")
+    public ResponseEntity<Void> logout() throws IdInValidException {
+        String email = SecurityUtil
+                .getCurrentUserLogin()
+                .orElse("");
+        if (email.isEmpty()) {
+            throw new IdInValidException("Access token is in valid");
+        }
+
+        // update refreshToken = null
+        this.userService.updateUserToken(null, email);
+
+        // remove refreshToken cookies
+        ResponseCookie deleteSpringCookie = ResponseCookie
+                .from(REFRESH_TOKEN, "")
+                .httpOnly(true)
+                .path("/api/v1")
+                .secure(true)
+                .maxAge(0)
+                .build();
+        return ResponseEntity
+                .ok()
+                .header(HttpHeaders.SET_COOKIE, deleteSpringCookie.toString())
+                .build();
+    }
+
 }
