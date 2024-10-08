@@ -2,11 +2,13 @@ package com.peter.tanxuanfood.convert.util;
 
 import com.nimbusds.jose.util.Base64;
 import com.peter.tanxuanfood.domain.dto.ResLoginDTO;
+import com.peter.tanxuanfood.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,12 +20,14 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class SecurityUtil {
 
+    private final UserService userService;
     private final JwtEncoder jwtEncoder;
     private final Logger logger = LoggerFactory.getLogger(SecurityUtil.class);
 
@@ -39,17 +43,22 @@ public class SecurityUtil {
     private long refreshTokenExpiration;
 
 
-    public String createAccessToken(String email, ResLoginDTO.UserLogin userLogin){
-         Instant now = Instant.now();
-         Instant validity = now.plus(this.accessTokenExpiration, ChronoUnit.SECONDS);
+    public String createAccessToken(String email, ResLoginDTO.UserLogin userLogin) {
+
+       Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+       List<String> authorities = authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList();
+
+        Instant now = Instant.now();
+        Instant validity = now.plus(this.accessTokenExpiration, ChronoUnit.SECONDS);
 
 
-         // @formatter:off
+        // @formatter:off
          JwtClaimsSet claims = JwtClaimsSet.builder()
                                            .issuedAt(now)
                                            .expiresAt(validity)
                                            .subject(email)
                                            .claim("user", userLogin)
+                 .claim("authorities", authorities)
                                            .build();
          JwsHeader jwsHeader = JwsHeader.with(JWT_ALGORITHM).build();
          return this.jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader, claims)).getTokenValue();

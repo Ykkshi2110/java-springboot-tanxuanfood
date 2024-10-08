@@ -1,5 +1,6 @@
 package com.peter.tanxuanfood.domain;
 
+import com.peter.tanxuanfood.convert.util.SecurityUtil;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
@@ -29,11 +30,23 @@ public class Product {
     private double price;
 
     @Min(value = 0, message = "Stock Quantity must be greater than 0")
-    private String stockQuantity;
+    private long stockQuantity;
 
-    private boolean isAvailable;
+    private Boolean isAvailable;
     private Instant createdAt;
     private Instant updatedAt;
     private String createdBy;
     private String updatedBy;
+
+    @PrePersist
+    public void handleBeforeCreate(){
+        this.createdAt = Instant.now();
+        this.createdBy = SecurityUtil.getCurrentUserLogin().orElse("");
+    }
+
+    @PreUpdate
+    public void handleBeforeUpdate(){
+        this.updatedAt = Instant.now();
+        this.updatedBy = SecurityUtil.getCurrentUserLogin().orElse("");
+    }
 }

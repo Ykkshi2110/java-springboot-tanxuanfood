@@ -1,5 +1,6 @@
 package com.peter.tanxuanfood.config;
 
+import com.peter.tanxuanfood.convert.util.AuthoritiesConstants;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -30,6 +31,8 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/v1/auth/login", "/api/v1/auth/refresh").permitAll()
+                        .requestMatchers("/api/v1/users/**").hasAuthority(AuthoritiesConstants.ADMIN)
+                        .requestMatchers("/api/v1/roles/**").hasAuthority(AuthoritiesConstants.CEO)
                         .anyRequest()
                         .authenticated())
                 .oauth2ResourceServer(oauth2 -> oauth2

@@ -1,6 +1,7 @@
 package com.peter.tanxuanfood.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.peter.tanxuanfood.convert.util.SecurityUtil;
 import com.peter.tanxuanfood.type.RoleType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -35,4 +36,16 @@ public class Role {
     private Instant updatedAt;
     private String createdBy;
     private String updatedBy;
+
+    @PrePersist
+    public void handleBeforeCreate() {
+        this.createdAt = Instant.now();
+        this.createdBy = SecurityUtil.getCurrentUserLogin().orElse("");
+    }
+
+    @PreUpdate
+    public void handleBeforeUpdate() {
+        this.updatedAt = Instant.now();
+        this.updatedBy = SecurityUtil.getCurrentUserLogin().orElse("");
+    }
 }
