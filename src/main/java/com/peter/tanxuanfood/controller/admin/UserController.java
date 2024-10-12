@@ -1,9 +1,9 @@
-package com.peter.tanxuanfood.controller;
+package com.peter.tanxuanfood.controller.admin;
 
 import com.peter.tanxuanfood.convert.annotation.ApiMessage;
 import com.peter.tanxuanfood.domain.ApiResponse;
 import com.peter.tanxuanfood.domain.User;
-import com.peter.tanxuanfood.domain.dto.CreateUserRequest;
+import com.peter.tanxuanfood.domain.request.CreateUserRequest;
 import com.peter.tanxuanfood.domain.dto.ResultPaginationDTO;
 import com.peter.tanxuanfood.domain.dto.UserDTO;
 import com.peter.tanxuanfood.service.UserService;

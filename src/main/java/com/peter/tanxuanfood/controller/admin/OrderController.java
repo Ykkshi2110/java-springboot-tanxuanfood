@@ -1,7 +1,7 @@
-package com.peter.tanxuanfood.controller;
+package com.peter.tanxuanfood.controller.admin;
 
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class CartController {
+public class OrderController {
 }

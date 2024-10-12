@@ -5,7 +5,6 @@ import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.mapping.Join;
 
 @Getter
 @Setter
@@ -20,7 +19,7 @@ public class CartDetail {
     private double price;
 
     @Min(value = 0, message = "Quantity must be greater than 0")
-    private int quantity;
+    private long quantity;
 
     @ManyToOne
     @JoinColumn(name = "cart_id")

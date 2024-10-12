@@ -1,4 +1,4 @@
-package com.peter.tanxuanfood.domain.dto;
+package com.peter.tanxuanfood.domain.request;
 
 import com.peter.tanxuanfood.domain.Role;
 import jakarta.validation.constraints.Email;

@@ -1,4 +1,4 @@
-package com.peter.tanxuanfood.controller;
+package com.peter.tanxuanfood.controller.admin;
 
 import com.peter.tanxuanfood.convert.annotation.ApiMessage;
 import com.peter.tanxuanfood.convert.util.SecurityUtil;

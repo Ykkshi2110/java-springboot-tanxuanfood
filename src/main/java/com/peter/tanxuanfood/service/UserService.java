@@ -3,7 +3,7 @@ package com.peter.tanxuanfood.service;
 import com.peter.tanxuanfood.domain.Meta;
 import com.peter.tanxuanfood.domain.Role;
 import com.peter.tanxuanfood.domain.User;
-import com.peter.tanxuanfood.domain.dto.CreateUserRequest;
+import com.peter.tanxuanfood.domain.request.CreateUserRequest;
 import com.peter.tanxuanfood.domain.dto.ResultPaginationDTO;
 import com.peter.tanxuanfood.domain.dto.UserDTO;
 import com.peter.tanxuanfood.exception.IdInValidException;
