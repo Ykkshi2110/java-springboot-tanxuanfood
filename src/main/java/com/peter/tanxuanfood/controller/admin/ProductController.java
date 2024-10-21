@@ -2,6 +2,7 @@ package com.peter.tanxuanfood.controller.admin;
 
 import com.peter.tanxuanfood.convert.annotation.ApiMessage;
 import com.peter.tanxuanfood.domain.Product;
+import com.peter.tanxuanfood.domain.dto.ProductFilter;
 import com.peter.tanxuanfood.domain.dto.ResultPaginationDTO;
 import com.peter.tanxuanfood.service.ProductService;
 import jakarta.validation.Valid;
@@ -49,6 +50,12 @@ public class ProductController {
     public ResponseEntity<Void> handleDeleteProduct(@PathVariable long id) {
         this.productService.handleDeleteProduct(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+    }
+
+    @GetMapping("/products/search")
+    @ApiMessage("Search a product")
+    public ResponseEntity<ResultPaginationDTO> handleSearchProduct(@RequestBody  ProductFilter productFilter, Pageable pageable) {
+        return ResponseEntity.status(HttpStatus.OK).body(this.productService.searchProduct(productFilter, pageable));
     }
 
 

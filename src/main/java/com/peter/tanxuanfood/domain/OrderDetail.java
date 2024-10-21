@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Min;
 import lombok.Getter;
 import lombok.Setter;
 
+
 @Getter
 @Setter
 @Entity
@@ -19,7 +20,7 @@ public class OrderDetail {
     private double price;
 
     @Min(value = 0, message = "Quantity must be greater than 0")
-    private int quantity;
+    private long quantity;
 
     @ManyToOne
     @JoinColumn(name = "product_id")

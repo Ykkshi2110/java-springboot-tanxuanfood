@@ -1,7 +1,7 @@
 package com.peter.tanxuanfood.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.peter.tanxuanfood.domain.ApiResponse;
+import com.peter.tanxuanfood.domain.dto.ApiResponse;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

@@ -1,4 +1,4 @@
-package com.peter.tanxuanfood.domain;
+package com.peter.tanxuanfood.domain.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;

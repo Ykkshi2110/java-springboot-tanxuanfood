@@ -2,8 +2,10 @@ package com.peter.tanxuanfood.controller.user;
 
 import com.peter.tanxuanfood.convert.annotation.ApiMessage;
 import com.peter.tanxuanfood.convert.util.SecurityUtil;
+import com.peter.tanxuanfood.domain.dto.CheckOutResponse;
 import com.peter.tanxuanfood.domain.dto.ResAddProductDTO;
 import com.peter.tanxuanfood.domain.request.AddProductRequest;
+import com.peter.tanxuanfood.domain.request.OrderInformationRequest;
 import com.peter.tanxuanfood.service.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -33,4 +35,20 @@ public class ItemsController {
         this.productService.handleDeleteProductInCart(id);
         return ResponseEntity.status(HttpStatus.OK).body("Product deleted in cart successfully");
     }
+
+    @GetMapping("/pre-checkout")
+    @ApiMessage("Pre-CheckOut")
+    public ResponseEntity<CheckOutResponse> handlePreCheckout(){
+        String email = SecurityUtil.getCurrentUserLogin().orElse("");
+        return ResponseEntity.status(HttpStatus.OK).body(this.productService.preCheckOut(email));
+    }
+
+    @PostMapping("/checkout")
+    @ApiMessage("Checkout")
+    public ResponseEntity<CheckOutResponse> handleCheckout(@Valid @RequestBody OrderInformationRequest orderInformationRequest){
+        String email = SecurityUtil.getCurrentUserLogin().orElse("");
+        return ResponseEntity.status(HttpStatus.CREATED).body(this.productService.handleCheckOut(email, orderInformationRequest));
+
+    }
+    
 }

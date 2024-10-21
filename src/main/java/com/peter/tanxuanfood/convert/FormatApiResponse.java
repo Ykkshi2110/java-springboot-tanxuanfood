@@ -1,7 +1,7 @@
 package com.peter.tanxuanfood.convert;
 
 import com.peter.tanxuanfood.convert.annotation.ApiMessage;
-import com.peter.tanxuanfood.domain.ApiResponse;
+import com.peter.tanxuanfood.domain.dto.ApiResponse;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.MediaType;

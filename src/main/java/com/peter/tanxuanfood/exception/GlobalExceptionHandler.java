@@ -1,12 +1,13 @@
 package com.peter.tanxuanfood.exception;
 
-import com.peter.tanxuanfood.domain.ApiResponse;
+import com.peter.tanxuanfood.domain.dto.ApiResponse;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -53,6 +54,16 @@ public class GlobalExceptionHandler {
         apiResponse.setError(e.getCause().getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiResponse);
     }
+
+    @ExceptionHandler(value = {AuthenticationException.class})
+    public ResponseEntity<ApiResponse<Object>> handleAuthenticationException(AuthenticationException e) {
+        ApiResponse<Object> apiResponse = new ApiResponse<>();
+        apiResponse.setStatusCode(HttpStatus.UNAUTHORIZED.value());
+        apiResponse.setMessage("Exception occurs...");
+        apiResponse.setError(e.getMessage());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(apiResponse);
+    }
+
 
     //    Handle Exception not define
 //    @ExceptionHandler(Exception.class)

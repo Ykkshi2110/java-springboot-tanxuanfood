@@ -1,7 +1,7 @@
 package com.peter.tanxuanfood.controller.admin;
 
 import com.peter.tanxuanfood.convert.annotation.ApiMessage;
-import com.peter.tanxuanfood.domain.ApiResponse;
+import com.peter.tanxuanfood.domain.dto.ApiResponse;
 import com.peter.tanxuanfood.domain.User;
 import com.peter.tanxuanfood.domain.request.CreateUserRequest;
 import com.peter.tanxuanfood.domain.dto.ResultPaginationDTO;

@@ -18,7 +18,7 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @EnableMethodSecurity(securedEnabled = true)
 @EnableWebSecurity
-public class SecurityConfig {
+public class SecurityConfiguration {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -30,9 +30,12 @@ public class SecurityConfig {
         httpSecurity
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/auth/login", "/api/v1/auth/refresh").permitAll()
+                        .requestMatchers("/api/v1/auth/login", "/api/v1/auth/refresh", "/api/v1/auth/logout").permitAll()
                         .requestMatchers("/api/v1/users/**").hasAuthority(AuthoritiesConstants.ADMIN)
                         .requestMatchers("/api/v1/roles/**").hasAuthority(AuthoritiesConstants.CEO)
+                        .requestMatchers("/api/v1/orders/update").hasAnyAuthority(AuthoritiesConstants.USER, AuthoritiesConstants.ADMIN)
+                        .requestMatchers("/api/v1/orders/").hasAnyAuthority(AuthoritiesConstants.USER, AuthoritiesConstants.ADMIN)
+                        .requestMatchers("/api/v1/orders/**").hasAuthority(AuthoritiesConstants.ADMIN)
                         .anyRequest()
                         .authenticated())
                 .oauth2ResourceServer(oauth2 -> oauth2
@@ -45,5 +48,4 @@ public class SecurityConfig {
         return httpSecurity.build();
 
     }
-
 }
