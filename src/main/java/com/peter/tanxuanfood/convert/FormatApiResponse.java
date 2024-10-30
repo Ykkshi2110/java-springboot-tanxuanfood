@@ -26,6 +26,12 @@ public class FormatApiResponse implements ResponseBodyAdvice{
         if (body instanceof String) {
             return body;
         }
+
+        String path = request.getURI().getPath();
+        if (path.startsWith("/v3/api-docs") || path.startsWith("/swagger-ui")) {
+            return body;
+        }
+
         ApiResponse<Object> res = new ApiResponse<>();
         res.setStatusCode(status);
 
